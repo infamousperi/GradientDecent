@@ -5,7 +5,6 @@ from Classes.LinearLayer import LinearLayer
 
 class TestLinearLayer(unittest.TestCase):
     def test_forward_pass(self):
-        # Simple input, weights, and bias
         # Fixed values for input, weights, and bias
         input_data = np.array([[1, 2], [3, 4]])
         weights = np.array([[0.1, 0.2], [0.3, 0.4]])
@@ -26,12 +25,10 @@ class TestLinearLayer(unittest.TestCase):
         np.testing.assert_allclose(A, A_expected)
 
     def test_backward_pass(self):
-        # Input data from the forward pass
+        # Fixed values for input, weights, and bias
         input_data = np.array([[1, 2], [3, 4]])
-
-        # Weights and bias (same as forward pass for consistency)
-        weights = np.array([[0.5, 0.7], [0.3, 0.4]])
-        bias = np.array([[0.1], [0.2]])
+        weights = np.array([[0.1, 0.2], [0.3, 0.4]])
+        bias = np.array([[0.5], [1.0]])
 
         # Expected output gradient (arbitrary for testing)
         output_gradient = np.array([[0.5, 0.6], [0.7, 0.8]])
@@ -41,15 +38,12 @@ class TestLinearLayer(unittest.TestCase):
         layer.weights = weights
         layer.bias = bias
 
-        # Forward pass (to get actual output)
-        A = layer.forward_pass(input_data)
-
         # Backward pass
-        dA, weight_gradient, bias_gradient = layer.backward_pass(A, output_gradient)
+        dA, weight_gradient, bias_gradient = layer.backward_pass(input_data, output_gradient)
 
-        # Expected input gradient (calculated using output_gradient and weights)
-        expected_dA = np.array([[0.43, 0.59], [0.59, 0.81]])
-        expected_weight_gradient = np.array([[4.15, 2.49], [4.8, 2.88]])
+        # Expected values
+        expected_dA = np.array([[0.23, 0.34], [0.31, 0.46]])
+        expected_weight_gradient = np.array([[2.6, 3.8], [3.0, 4.4]])
         expected_bias_gradient = np.array([1.2, 1.4])
 
         # Compare gradients
