@@ -26,28 +26,14 @@ class NeuralNetwork:
         return a_output
 
     def backward_pass(self, input_data: np.ndarray, output_gradient: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        # Forward pass within backward pass (to calculate activations)
-        z_hidden = self.hidden_layer.forward_pass(input_data)
-        a_hidden = 1 / (1 + np.exp(-z_hidden))
+        a_hidden = stable_sigmoid(self.hidden_layer.z)
 
-        z_output = self.output_layer.forward_pass(a_hidden)
-        a_output = stable_sigmoid(z_output)
-
-        # Output layer gradients (using calculated a_output)
-        dA_output = output_gradient * (a_output * (1 - a_output))
-        dZ_output = dA_output * (a_output * (1 - a_output))
-        dWeights_output = np.dot(dZ_output.T, a_hidden)
-        dBiases_output = np.sum(dZ_output, axis=0)
-        #print("dWeights_output shape:", dWeights_output.shape)
-        #print("Output layer weights shape:", self.output_layer.weights.shape)
-
+        # Output layer gradients
+        dA_output, dWeights_output, dBias_output = self.output_layer.backward_pass(a_hidden, output_gradient)
         # Hidden layer gradients
-        dA_hidden = np.dot(dZ_output, self.output_layer.weights)
-        dZ_hidden = dA_hidden * (a_hidden * (1 - a_hidden))
-        dWeights_hidden = np.dot(input_data.T, dZ_hidden).reshape(self.hidden_layer.weights.shape)
-        dBiases_hidden = np.sum(dZ_hidden, axis=0)
+        dA_hidden, dWeights_hidden, dBias_hidden = self.hidden_layer.backward_pass(input_data, dA_output)
 
-        return dWeights_hidden, dBiases_hidden, dWeights_output, dBiases_output
+        return dWeights_hidden, dBias_hidden, dWeights_output, dBias_output
 
     def parameter_update(self, dWeights_hidden: np.ndarray, dBiases_hidden: np.ndarray, dWeights_output: np.ndarray, dBiases_output: np.ndarray) -> None:
         # Update hidden layer parameters

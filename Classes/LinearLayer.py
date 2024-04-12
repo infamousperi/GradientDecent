@@ -3,6 +3,7 @@ import numpy as np
 
 class LinearLayer:
     def __init__(self, input_size: int, output_size: int, learning_rate: float = 0.1) -> None:
+        self.z = None
         self.input_size = input_size
         self.output_size = output_size
         self.learning_rate = learning_rate
@@ -13,6 +14,7 @@ class LinearLayer:
 
     def forward_pass(self, input_data: np.ndarray) -> np.ndarray:
         output_data = np.dot(input_data, self.weights.T) + self.bias
+        self.z = output_data
 
         return output_data
 
