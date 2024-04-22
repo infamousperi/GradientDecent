@@ -39,8 +39,8 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
             batch_train_labels = train_labels_shuffled[i:i + batch_size]
 
             # Forward pass
-            logits = model.forward_pass(batch_train_images)
-            predictions = softmax(logits)
+            outputs = model.forward_pass(batch_train_images)
+            predictions = softmax(outputs)
             train_loss = categorical_cross_entropy(predictions, batch_train_labels)
             error_propagation = predictions - batch_train_labels
             gradients = model.backward_pass(batch_train_images, error_propagation)
@@ -49,14 +49,14 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
             model.parameter_update(*gradients)
 
         # Evaluation on the entire training data
-        train_logits = model.forward_pass(train_images)
-        train_predictions = softmax(train_logits)
+        train_outputs = model.forward_pass(train_images)
+        train_predictions = softmax(train_outputs)
         train_loss = categorical_cross_entropy(train_predictions, train_labels)
         train_accuracy = categorical_compute_accuracy(train_predictions, train_labels)
 
         # Evaluation on the entire test data
-        test_logits = model.forward_pass(test_images)
-        test_predictions = softmax(test_logits)
+        test_outputs = model.forward_pass(test_images)
+        test_predictions = softmax(test_outputs)
         test_loss = categorical_cross_entropy(test_predictions, test_labels)
         test_accuracy = categorical_compute_accuracy(test_predictions, test_labels)
 
