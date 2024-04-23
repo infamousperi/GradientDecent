@@ -19,8 +19,8 @@ class LinearLayer:
         return output_data
 
     def backward_pass(self, input_data: np.ndarray, output_gradient: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        dA = np.matmul(output_gradient, self.weights)  # Vectorized matrix multiplication
-        weight_gradient = np.matmul(output_gradient.T, input_data)  # Vectorized matrix multiplication
+        dA = np.dot(output_gradient, self.weights)  # Vectorized matrix multiplication
+        weight_gradient = np.dot(output_gradient.T, input_data)  # Vectorized matrix multiplication
         bias_gradient = np.sum(output_gradient, axis=0)  # Efficient sum across batches
 
         return dA, weight_gradient, bias_gradient

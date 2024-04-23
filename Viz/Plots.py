@@ -41,15 +41,30 @@ def show_evaluation_results(e_results):
             results_by_lr[lr] = []
         results_by_lr[lr].append(result)
 
-    # Now plot each group in a separate figure
+    # Now plot each group in a separate figure with subplots for loss and accuracy
     for lr, results in results_by_lr.items():
-        plt.figure(figsize=(8, 6))
+        # Create a figure with two subplots (1 row, 2 columns)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))  # Adjusting figsize to accommodate both plots
+
+        # Plot training loss on the first subplot
         for res in results:
-            plt.plot(res['epochs'], res['train_loss'], marker='o', linestyle='-',
+            ax1.plot(res['epochs'], res['train_loss'], marker='o', linestyle='-',
                      label=f"Hidden Size: {res['hidden_layer_size']}")
-        plt.title(f'Training Loss Over Epochs\nLearning Rate: {lr}')
-        plt.xlabel('Epoch')
-        plt.ylabel('Training Loss')
-        plt.legend(title="Hidden Layer Sizes")
-        plt.grid(True)
+        ax1.set_title(f'Training Loss Over Epochs\nLearning Rate: {lr}')
+        ax1.set_xlabel('Epoch')
+        ax1.set_ylabel('Training Loss')
+        ax1.legend(title="Hidden Layer Sizes")
+        ax1.grid(True)
+
+        # Plot training accuracy on the second subplot
+        for res in results:
+            ax2.plot(res['epochs'], res['train_accuracy'], marker='o', linestyle='-',
+                     label=f"Hidden Size: {res['hidden_layer_size']}")
+        ax2.set_title(f'Training Accuracy Over Epochs\nLearning Rate: {lr}')
+        ax2.set_xlabel('Epoch')
+        ax2.set_ylabel('Training Accuracy')
+        ax2.legend(title="Hidden Layer Sizes")
+        ax2.grid(True)
+
+        # Show the complete figure with both subplots
         plt.show()

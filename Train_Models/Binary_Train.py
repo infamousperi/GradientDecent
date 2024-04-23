@@ -16,7 +16,7 @@ def binary_cross_entropy(predictions, targets, epsilon=1e-10):
     return loss
 
 
-def binary_train_model(model, train_images, train_labels, test_images, test_labels, epochs, patience, batch_size):
+def binary_train_model(model, train_images, train_labels, test_images, test_labels, epochs, patience, batch_size, do_break = True):
     best_test_loss = float('inf')
     wait = 0
     train_losses, test_losses, train_accuracies, test_accuracies = [], [], [], []
@@ -29,12 +29,14 @@ def binary_train_model(model, train_images, train_labels, test_images, test_labe
 
         # Mini-batch gradient descent
         for i in range(0, train_images.shape[0], batch_size):
-            batch_train_images = train_images_shuffled[i:i + batch_size]
-            batch_train_labels = train_labels_shuffled[i:i + batch_size]
+            end = i + batch_size
+            if end > train_images.shape[0]:
+                end = train_images.shape[0]
+            batch_train_images = train_images_shuffled[i:end]
+            batch_train_labels = train_labels_shuffled[i:end]
 
             # Forward pass
             predictions = model.forward_pass(batch_train_images)
-            train_loss = binary_cross_entropy(predictions, batch_train_labels)
             error_propagation = predictions - batch_train_labels
             gradients = model.backward_pass(batch_train_images, error_propagation)
 
@@ -62,21 +64,22 @@ def binary_train_model(model, train_images, train_labels, test_images, test_labe
         print(f'Epoch {epoch + 1}, Train Loss: {train_loss}, Test Loss: {test_loss}, '
               f'Train Accuracy: {train_accuracy}, Test Accuracy: {test_accuracy}')
 
-        # Early stopping based on test loss
-        if test_loss < best_test_loss:
-            best_test_loss = test_loss
-            wait = 0  # Reset wait counter
-        else:
-            wait += 1
-        if wait >= patience:
-            print(f"Stopping early due to lack of improvement in test loss at epoch {epoch + 1}.")
-            break
+        if do_break:
+            # Early stopping based on test loss
+            if test_loss < best_test_loss:
+                best_test_loss = test_loss
+                wait = 0  # Reset wait counter
+            else:
+                wait += 1
+            if wait >= patience:
+                print(f"Stopping early due to lack of improvement in test loss at epoch {epoch + 1}.")
+                break
 
     return train_losses, test_losses, train_accuracies, test_accuracies
 
 
 def binary_evaluate_combinations(train_images, train_labels, test_images, test_labels, epochs, patience, batch_size,
-                                 learning_rates, hidden_layer_sizes):
+                                 learning_rates, hidden_layer_sizes, do_break = True):
     results = []
 
     for lr in learning_rates:
@@ -89,7 +92,7 @@ def binary_evaluate_combinations(train_images, train_labels, test_images, test_l
 
             # Train model using the provided train_model function
             train_loss, test_loss, train_accuracy, test_accuracy = binary_train_model(
-                model, train_images, train_labels, test_images, test_labels, epochs, patience, batch_size
+                model, train_images, train_labels, test_images, test_labels, epochs, patience, batch_size, do_break
             )
 
             # Store the training process results for this combination
@@ -98,6 +101,8 @@ def binary_evaluate_combinations(train_images, train_labels, test_images, test_l
                 "hidden_layer_size": hidden_size,
                 "train_loss": train_loss,
                 "test_loss": test_loss,
+                "train_accuracy": train_accuracy,
+                "test_accuracy": test_accuracy,
                 "epochs": list(range(1, len(test_loss) + 1))  # Generating a list of epoch numbers
             })
 
