@@ -43,7 +43,11 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
             # Forward and backward pass through the model
             predictions = model.forward_pass(batch_train_images)
             error_propagation = predictions - batch_train_labels
-            model.backward_pass(batch_train_images, error_propagation)
+            gradients = model.backward_pass(batch_train_images, error_propagation)
+
+            # Update model parameters
+            hidden_gradients, output_gradients = gradients
+            model.parameter_update(hidden_gradients, output_gradients)
 
 
         # Evaluation on the entire training and test datasets
