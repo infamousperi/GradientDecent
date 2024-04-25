@@ -18,14 +18,16 @@ class NeuralNetwork:
         current_input = input_data
         for layer in self.hidden_layers:
             z = layer.forward_pass(current_input)
-            current_input = stable_sigmoid(z)  # Activation function
+            current_input = hidden_activation(z, self.output_dim)
+
         z_output = self.output_layer.forward_pass(current_input)
-        a_output = stable_sigmoid(z_output)
+        a_output = output_activation(z_output, self.output_dim)
 
         return a_output
 
-    def backward_pass(self, input_data: np.ndarray, output_gradient: np.ndarray) -> tuple[list[tuple[np.ndarray, np.ndarray]], tuple[np.ndarray, np.ndarray]]:
-        a_hidden = [stable_sigmoid(layer.z) for layer in self.hidden_layers]
+    def backward_pass(self, input_data: np.ndarray, output_gradient: np.ndarray) -> tuple[
+        list[tuple[np.ndarray, np.ndarray]], tuple[np.ndarray, np.ndarray]]:
+        a_hidden = [hidden_activation(layer.z, self.output_dim) for layer in self.hidden_layers]
         a_hidden.insert(0, input_data)
 
         # Output layer gradients
@@ -35,7 +37,8 @@ class NeuralNetwork:
         gradients = []
         for i in reversed(range(len(self.hidden_layers))):
             # Calculate gradient of the activation
-            sig_deriv = sigmoid_derivative(a_hidden[i + 1])
+            sig_deriv = hidden_derivative(a_hidden[i + 1], self.output_dim)
+
             # Apply chain rule (element-wise multiplication with sigmoid derivative)
             dA_prev *= sig_deriv
 
@@ -59,6 +62,27 @@ class NeuralNetwork:
         self.output_layer.learning_rate = new_learning_rate
 
 
+def output_activation(output, output_dim):
+    if output_dim > 1:
+        return softmax(output)
+    else:
+        return stable_sigmoid(output)
+
+
+def hidden_activation(output, output_dim):
+    if output_dim > 1:
+        return relu(output)
+    else:
+        return stable_sigmoid(output)
+
+
+def hidden_derivative(output, output_dim):
+    if output_dim > 1:
+        return relu_derivative(output)
+    else:
+        return sigmoid_derivative(output)
+
+
 def stable_sigmoid(x):
     "Compute sigmoid function in a way that avoids overflow."
     z = np.exp(-np.abs(x))
@@ -66,5 +90,18 @@ def stable_sigmoid(x):
     return sigmoid
 
 
-def sigmoid_derivative(output):
-    return output * (1 - output)
+def sigmoid_derivative(a):
+    return a * (1 - a)
+
+
+def softmax(z):
+    exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))  # Avoid overflow
+    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
+
+def relu(x):
+    return np.maximum(0, x)
+
+
+def relu_derivative(x):
+    return (x > 0).astype(float)

@@ -25,6 +25,7 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
     wait = 0
     train_losses, test_losses, train_accuracies, test_accuracies = [], [], [], []
 
+
     for epoch in range(epochs):
         # Shuffle the training data
         permutation = np.random.permutation(train_images.shape[0])
@@ -41,8 +42,9 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
 
             # Forward and backward pass through the model
             predictions = model.forward_pass(batch_train_images)
-            loss = softmax_cross_entropy(predictions, batch_train_labels)
-            model.backward_pass(batch_train_images, batch_train_labels)
+            error_propagation = predictions - batch_train_labels
+            model.backward_pass(batch_train_images, error_propagation)
+
 
         # Evaluation on the entire training and test datasets
         train_predictions = model.forward_pass(train_images)
