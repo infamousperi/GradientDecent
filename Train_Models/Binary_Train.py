@@ -16,9 +16,7 @@ def binary_cross_entropy(predictions, targets, epsilon=1e-10):
     return loss
 
 
-def binary_train_model(model, train_images, train_labels, test_images, test_labels, epochs, patience, batch_size, do_break = True):
-    best_test_loss = float('inf')
-    wait = 0
+def binary_train_model(model, train_images, train_labels, test_images, test_labels, epochs, batch_size):
     train_losses, test_losses, train_accuracies, test_accuracies = [], [], [], []
 
     for epoch in range(epochs):
@@ -64,22 +62,11 @@ def binary_train_model(model, train_images, train_labels, test_images, test_labe
         print(f'Epoch {epoch + 1}, Train Loss: {train_loss}, Test Loss: {test_loss}, '
               f'Train Accuracy: {train_accuracy}, Test Accuracy: {test_accuracy}')
 
-        if do_break:
-            # Early stopping based on test loss
-            if test_loss < best_test_loss:
-                best_test_loss = test_loss
-                wait = 0  # Reset wait counter
-            else:
-                wait += 1
-            if wait >= patience:
-                print(f"Stopping early due to lack of improvement in test loss at epoch {epoch + 1}.")
-                break
-
     return train_losses, test_losses, train_accuracies, test_accuracies
 
 
-def binary_evaluate_combinations(train_images, train_labels, test_images, test_labels, epochs, patience, batch_size,
-                                 learning_rates, hidden_layer_sizes, do_break = True):
+def binary_evaluate_combinations(train_images, train_labels, test_images, test_labels, epochs, batch_size,
+                                 learning_rates, hidden_layer_sizes):
     results = []
 
     for lr in learning_rates:
@@ -92,7 +79,7 @@ def binary_evaluate_combinations(train_images, train_labels, test_images, test_l
 
             # Train model using the provided train_model function
             train_loss, test_loss, train_accuracy, test_accuracy = binary_train_model(
-                model, train_images, train_labels, test_images, test_labels, epochs, patience, batch_size, do_break
+                model, train_images, train_labels, test_images, test_labels, epochs, batch_size
             )
 
             # Store the training process results for this combination

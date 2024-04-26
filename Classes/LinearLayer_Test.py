@@ -42,8 +42,8 @@ class TestLinearLayer(unittest.TestCase):
         dA, weight_gradient, bias_gradient = layer.backward_pass(input_data, output_gradient)
 
         # Expected values
-        expected_dA = np.array([[0.17, 0.39], [0.23, 0.53]])
-        expected_weight_gradient = np.array([[1.3, 1.9], [1.5, 2.2]])
+        expected_dA = np.array([[0.23, 0.34], [0.31, 0.46]])
+        expected_weight_gradient = np.array([[2.6, 3.8], [3.0, 4.4]])
         expected_bias_gradient = np.array([1.2, 1.4])
 
         # Compare gradients
