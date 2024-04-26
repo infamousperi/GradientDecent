@@ -1,23 +1,23 @@
 def rank_results(results):
     metrics = [{'name': 'train_loss', 'ascending': True}, {'name': 'train_accuracy', 'ascending': False}]
-    def extract_last_values(result, metrics):
-        return {metric: result.get(metric, [-1])[-1] for metric in metrics}
+
+    def extract_last_values(result, metric_names):
+        # Retrieve the last value for each metric from the result
+        return {metric: result.get(metric, [-1])[-1] for metric in metric_names}
 
     def sort_key(result):
-        # Extract last values based on provided metrics and their desired sort order
+        # Create a tuple of metrics for sorting
         values = extract_last_values(result, [m['name'] for m in metrics])
         return tuple((values[m['name']] if m['ascending'] else -values[m['name']]) for m in metrics)
 
+    # Sort results based on the specified metrics and their order
     ranked_results = sorted(results, key=sort_key)
 
-    formatted_results = ""
+    # Print out the ranked results in markdown format
+    print("## Ranked Results\n")
     for i, result in enumerate(ranked_results, start=1):
-        formatted_results += f"Rank {i}:\n"
-        formatted_results += f"  Learning Rate: {result.get('learning_rate', 'N/A')}\n"
-        formatted_results += f"  Hidden Layer Size: {result.get('hidden_layer_size', 'N/A')}\n"
-        formatted_results += f"  Last Values:\n"
         last_values = extract_last_values(result, [m['name'] for m in metrics])
-        for metric in metrics:
-            formatted_results += f"    {metric['name']}: {last_values.get(metric['name'], 'N/A')}\n"
-        formatted_results += "\n"
-    return formatted_results
+        print(f"**Rank {i}:** Learning Rate = {result.get('learning_rate', 'N/A')}, ", end="")
+        print(f"Hidden Layer Size = {result.get('hidden_layer_size', 'N/A')}, ", end="")
+        print(f"Train Loss = {last_values['train_loss']:.3f}, ", end="")
+        print(f"Train Accuracy = {last_values['train_accuracy'] * 100:.2f}%\n")

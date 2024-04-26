@@ -20,11 +20,11 @@ def softmax_cross_entropy(predictions, targets, epsilon=1e-10):
 
 
 def categorical_train_model(model, train_images, train_labels, test_images, test_labels, epochs, batch_size):
+    # Initialize lists to store metrics for each epoch
     train_losses, test_losses, train_accuracies, test_accuracies = [], [], [], []
 
-
     for epoch in range(epochs):
-        # Shuffle the training data
+        # Randomly shuffle the training data at the beginning of each epoch to prevent bias
         permutation = np.random.permutation(train_images.shape[0])
         train_images_shuffled = train_images[permutation]
         train_labels_shuffled = train_labels[permutation]
@@ -32,40 +32,43 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
         # Mini-batch gradient descent
         for i in range(0, train_images.shape[0], batch_size):
             end = i + batch_size
+            # Ensure the batch does not exceed the number of training samples
             if end > train_images.shape[0]:
                 end = train_images.shape[0]
             batch_train_images = train_images_shuffled[i:end]
             batch_train_labels = train_labels_shuffled[i:end]
 
-            # Forward and backward pass through the model
+            # Conduct forward and backward pass to update model parameters
             predictions = model.forward_pass(batch_train_images)
             error_propagation = predictions - batch_train_labels
             gradients = model.backward_pass(batch_train_images, error_propagation)
 
-            # Update model parameters
+            # Update the model's weights and biases based on computed gradients
             hidden_gradients, output_gradients = gradients
             model.parameter_update(hidden_gradients, output_gradients)
 
-
-        # Evaluation on the entire training and test datasets
+        # Evaluation of the model on the entire training set
         train_predictions = model.forward_pass(train_images)
         train_loss = softmax_cross_entropy(train_predictions, train_labels)
         train_accuracy = categorical_compute_accuracy(train_predictions, train_labels)
+
+        # Evaluation of the model on the entire test set
         test_predictions = model.forward_pass(test_images)
         test_loss = softmax_cross_entropy(test_predictions, test_labels)
         test_accuracy = categorical_compute_accuracy(test_predictions, test_labels)
 
-        # Store metrics
+        # Record performance metrics
         train_losses.append(train_loss)
         test_losses.append(test_loss)
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
 
-        # Print progress
+        # Output current epoch's performance metrics
         print(f'Epoch {epoch + 1}, Train Loss: {train_loss}, Test Loss: {test_loss}, '
               f'Train Accuracy: {train_accuracy}, Test Accuracy: {test_accuracy}')
 
     return train_losses, test_losses, train_accuracies, test_accuracies
+
 
 
 def categorical_evaluate_combinations(train_images, train_labels, test_images, test_labels, epochs,

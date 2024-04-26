@@ -17,10 +17,12 @@ def binary_cross_entropy(predictions, targets, epsilon=1e-10):
 
 
 def binary_train_model(model, train_images, train_labels, test_images, test_labels, epochs, batch_size):
+    # Lists to store the loss and accuracy metrics for both training and testing datasets
     train_losses, test_losses, train_accuracies, test_accuracies = [], [], [], []
 
+    # Loop over each epoch. An epoch is one full pass through the entire training dataset.
     for epoch in range(epochs):
-        # Shuffle the training data
+        # Shuffle the training data to prevent the model from learning the order of the training data
         permutation = np.random.permutation(train_images.shape[0])
         train_images_shuffled = train_images[permutation]
         train_labels_shuffled = train_labels[permutation]
@@ -28,37 +30,40 @@ def binary_train_model(model, train_images, train_labels, test_images, test_labe
         # Mini-batch gradient descent
         for i in range(0, train_images.shape[0], batch_size):
             end = i + batch_size
+            # Ensure the batch does not exceed the bounds of the array
             if end > train_images.shape[0]:
                 end = train_images.shape[0]
             batch_train_images = train_images_shuffled[i:end]
             batch_train_labels = train_labels_shuffled[i:end]
 
-            # Forward pass
+            # Forward pass: compute predictions from the input data
             predictions = model.forward_pass(batch_train_images)
+            # Compute the error as the difference between predictions and true labels
             error_propagation = predictions - batch_train_labels
+            # Backward pass: compute gradients of the loss with respect to model parameters
             gradients = model.backward_pass(batch_train_images, error_propagation)
 
-            # Update model parameters
+            # Update model parameters using the gradients computed
             hidden_gradients, output_gradients = gradients
             model.parameter_update(hidden_gradients, output_gradients)
 
-        # Evaluation on the entire training data
+        # Evaluate the model on the entire training dataset
         train_predictions = model.forward_pass(train_images)
         train_loss = binary_cross_entropy(train_predictions, train_labels)
         train_accuracy = binary_compute_accuracy(train_predictions, train_labels)
 
-        # Evaluation on the entire test data
+        # Evaluate the model on the entire testing dataset
         test_predictions = model.forward_pass(test_images)
         test_loss = binary_cross_entropy(test_predictions, test_labels)
         test_accuracy = binary_compute_accuracy(test_predictions, test_labels)
 
-        # Store metrics
+        # Append current epoch's metrics to lists
         train_losses.append(train_loss)
         test_losses.append(test_loss)
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
 
-        # Print progress
+        # Print progress to keep track of training process
         print(f'Epoch {epoch + 1}, Train Loss: {train_loss}, Test Loss: {test_loss}, '
               f'Train Accuracy: {train_accuracy}, Test Accuracy: {test_accuracy}')
 
