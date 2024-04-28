@@ -1,5 +1,10 @@
 def rank_results(results):
-    metrics = [{'name': 'train_loss', 'ascending': True}, {'name': 'train_accuracy', 'ascending': False}]
+    metrics = [
+        {'name': 'train_loss', 'ascending': True},
+        {'name': 'train_accuracy', 'ascending': False},
+        {'name': 'test_loss', 'ascending': True},
+        {'name': 'test_accuracy', 'ascending': False}
+    ]
 
     def extract_last_values(result, metric_names):
         # Retrieve the last value for each metric from the result
@@ -20,4 +25,6 @@ def rank_results(results):
         print(f"**Rank {i}:** Learning Rate = {result.get('learning_rate', 'N/A')}, ", end="")
         print(f"Hidden Layer Size = {result.get('hidden_layer_size', 'N/A')}, ", end="")
         print(f"Train Loss = {last_values['train_loss']:.3f}, ", end="")
-        print(f"Train Accuracy = {last_values['train_accuracy'] * 100:.2f}%\n")
+        print(f"Train Accuracy = {last_values['train_accuracy'] * 100:.2f}%, ", end="")
+        print(f"Test Loss = {last_values['test_loss']:.3f}, ", end="")
+        print(f"Test Accuracy = {last_values['test_accuracy'] * 100:.2f}%\n")
