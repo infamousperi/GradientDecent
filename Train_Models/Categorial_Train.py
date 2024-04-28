@@ -70,7 +70,6 @@ def categorical_train_model(model, train_images, train_labels, test_images, test
     return train_losses, test_losses, train_accuracies, test_accuracies
 
 
-
 def categorical_evaluate_combinations(train_images, train_labels, test_images, test_labels, epochs,
                                       batch_size,
                                       learning_rates, hidden_layer_sizes):

@@ -1,4 +1,3 @@
-from typing import Tuple, List
 import numpy as np
 from Classes.LinearLayer import LinearLayer
 
@@ -6,16 +5,6 @@ from Classes.LinearLayer import LinearLayer
 class NeuralNetwork:
     def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, hidden_layers: int,
                  learning_rate: float = 0.1):
-        """
-        Initializes a new neural network with specified dimensions and learning rate.
-
-        Parameters:
-        - input_dim: The size of the input data.
-        - hidden_dim: The size of each hidden layer.
-        - output_dim: The size of the output layer.
-        - hidden_layers: The number of hidden layers in the network.
-        - learning_rate: The step size used for updating the weights during training.
-        """
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.output_dim = output_dim
@@ -61,7 +50,7 @@ class NeuralNetwork:
         return gradients, (dWeights_output, dBias_output)
 
     def parameter_update(self, gradients: list[tuple[np.ndarray, np.ndarray]],
-                         output_gradients: tuple[np.ndarray, np.ndarray]) -> None:
+                         output_gradients: tuple[np.ndarray, np.ndarray]):
         # Update parameters for each hidden layer
         for i, (dWeights, dBias) in enumerate(gradients):
             self.hidden_layers[i].parameter_update(dWeights, dBias)
